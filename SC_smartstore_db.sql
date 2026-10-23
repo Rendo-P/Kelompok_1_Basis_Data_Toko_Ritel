@@ -61,6 +61,80 @@ INSERT INTO produk (id_produk, nama_produk, sku, harga_beli, harga_jual, stok_mi
 (104, 'Pembersih Lantai', 'KBH104', 12000, 18000, 15, 40, 4);
 
 -- Pertemuan 3
+
+
 -- Kosong
 
 -- Pertemuan 4
+-- Menambahkan Batasan Integritas (CHECK dan UNIQUE)[cite: 18]
+ALTER TABLE produk ADD CONSTRAINT chk_harga CHECK (harga_jual >= harga_beli);
+ALTER TABLE produk ADD CONSTRAINT uq_sku UNIQUE (sku);
+
+-- Membuat Virtual View[cite: 18]
+CREATE VIEW v_katalog_produk AS
+SELECT p.sku, p.nama_produk, k.nama_kategori, p.stok_aktual, p.harga_jual
+FROM produk p
+JOIN kategori k ON p.id_kategori = k.id_kategori;
+
+-- Stored Procedure (IN parameter)[cite: 18]
+DELIMITER //
+CREATE PROCEDURE tambah_stok_masuk(IN p_id_supplier INT, IN p_id_produk INT, IN p_jumlah INT)
+BEGIN
+    INSERT INTO transaksi_stok (id_supplier, id_produk, tipe_transaksi, jumlah)
+    VALUES (p_id_supplier, p_id_produk, 'masuk', p_jumlah);
+END //
+DELIMITER ;
+
+-- Database Trigger: ROW Trigger[cite: 18]
+DELIMITER //
+CREATE TRIGGER trg_after_transaksi_stok
+AFTER INSERT ON transaksi_stok
+FOR EACH ROW
+BEGIN
+    IF NEW.tipe_transaksi = 'masuk' THEN
+        UPDATE produk SET stok_aktual = stok_aktual + NEW.jumlah WHERE id_produk = NEW.id_produk;
+    ELSEIF NEW.tipe_transaksi = 'keluar' THEN
+        UPDATE produk SET stok_aktual = stok_aktual - NEW.jumlah WHERE id_produk = NEW.id_produk;
+    END IF;
+END //
+DELIMITER ;
+
+-- Pertemuan 5
+CREATE TABLE pelanggan (
+    id_pelanggan INT PRIMARY KEY,
+    nama_pelanggan VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE
+);
+
+CREATE TABLE penjualan (
+    id_penjualan INT PRIMARY KEY,
+    id_pelanggan INT,
+    tanggal_penjualan DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_pelanggan) REFERENCES pelanggan(id_pelanggan)
+);
+
+-- Insert Data Dummy Entitas
+INSERT INTO pelanggan (id_pelanggan, nama_pelanggan, email) VALUES 
+(1, 'Budi Santoso', 'budi@email.com'), 
+(2, 'Siti Aminah', 'siti@email.com');
+
+INSERT INTO penjualan (id_penjualan, id_pelanggan) VALUES 
+(1, 1), 
+(2, 2);
+
+-- Pertemuan 6: Tahapan Normalisasi Data
+CREATE TABLE detail_penjualan (
+    id_penjualan INT,
+    id_produk INT,
+    kuantitas INT NOT NULL CHECK (kuantitas > 0),
+    harga_satuan DECIMAL(12,2),
+    PRIMARY KEY (id_penjualan, id_produk),
+    FOREIGN KEY (id_penjualan) REFERENCES penjualan(id_penjualan),
+    FOREIGN KEY (id_produk) REFERENCES produk(id_produk)
+);
+
+-- Insert Data Hasil Normalisasi
+INSERT INTO detail_penjualan (id_penjualan, id_produk, kuantitas, harga_satuan) VALUES 
+(1, 101, 2, 3500), 
+(1, 102, 1, 5000), 
+(2, 104, 1, 18000);
