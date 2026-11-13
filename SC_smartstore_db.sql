@@ -166,7 +166,7 @@ ALTER TABLE supplier
     MODIFY id_supplier INT NOT NULL,
     MODIFY nama_supplier VARCHAR(100) NOT NULL,
     MODIFY kontak VARCHAR(50) NOT NULL,
-    MODIFY telepon VARCHAR(20) NOT NULL
+    CHANGE telepon nomor_telepon VARCHAR(20) NOT NULL
 ;
 
 ALTER TABLE transaksi_stok
@@ -184,4 +184,10 @@ ALTER TABLE transaksi_stok
     ADD CONSTRAINT fk_transaksi_supplier
         FOREIGN KEY (id_supplier) REFERENCES supplier(id_supplier)
         ON DELETE CASCADE
+;
+
+INSERT INTO transaksi_stok (id_transaksi, id_supplier, id_produk, jenis_transaksi, jumlah, waktu_transaksi) VALUES
+    (1, 2, 102, 'masuk', 40, DEFAULT),
+    (2, 1, 103, 'masuk', 30, DEFAULT),
+    (3, 3, 101, 'masuk', 10, DEFAULT)
 ;
