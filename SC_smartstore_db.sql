@@ -5,39 +5,39 @@ CREATE DATABASE smartsore_db;
 USE smartsore_db;
 
 CREATE TABLE kategori(
-    id_kategori INT,
-    nama_kategori VARCHAR(100),
+    id_kategori INT NOT NULL,
+    nama_kategori VARCHAR(100) NOT NULL,
     PRIMARY KEY (id_kategori)
 );
 
 CREATE TABLE produk(
-    id_produk INT,
-    nama_produk VARCHAR(100),
-    sku VARCHAR(50),
-    harga_beli DECIMAL(12,2),
-    harga_jual DECIMAL(12,2),
-    stok_minimum INT,
-    stok_aktual INT,
-    id_kategori INT,
+    id_produk INT NOT NULL,
+    nama_produk VARCHAR(100) NOT NULL,
+    sku VARCHAR(50) NOT NULL,
+    harga_beli DECIMAL(12,2) NOT NULL,
+    harga_jual DECIMAL(12,2) NOT NULL,
+    stok_minimum INT NOT NULL,
+    stok_aktual INT NOT NULL,
+    id_kategori INT NOT NULL,
     PRIMARY KEY (id_produk),
     FOREIGN KEY (id_kategori) REFERENCES kategori(id_kategori)
 );
 
 CREATE TABLE supplier(
-    id_supplier INT,
-    nama_supplier VARCHAR(100),
-    kontak VARCHAR(50),
-    telepon VARCHAR(20),
+    id_supplier INT NOT NULL,
+    nama_supplier VARCHAR(100) NOT NULL,
+    kontak VARCHAR(50) NOT NULL,
+    telepon VARCHAR(20) NOT NULL,
     PRIMARY KEY (id_supplier)
 );
 
 CREATE TABLE transaksi_stok(
-    id_transaksi INT,
-    id_supplier INT,
-    id_produk INT,
-    tipe_transaksi ENUM('masuk', 'keluar'),
-    jumlah INT,
-    waktu_transaksi DATETIME DEFAULT CURRENT_TIMESTAMP,
+    id_transaksi INT NOT NULL,
+    id_supplier INT NOT NULL,
+    id_produk INT NOT NULL,
+    tipe_transaksi ENUM('masuk', 'keluar') NOT NULL,
+    jumlah INT NOT NULL,
+    waktu_transaksi DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     PRIMARY KEY (id_transaksi),
     FOREIGN KEY (id_produk) REFERENCES produk(id_produk),
     FOREIGN KEY (id_supplier) REFERENCES supplier(id_supplier)
@@ -138,3 +138,49 @@ INSERT INTO detail_penjualan (id_penjualan, id_produk, kuantitas, harga_satuan) 
 (1, 101, 2, 3500), 
 (1, 102, 1, 5000), 
 (2, 104, 1, 18000);
+
+
+-- Revisi tahap 1 & 2
+ALTER TABLE kategori
+    MODIFY id_kategori INT NOT NULL,
+    MODIFY nama_kategori VARCHAR(100) NOT NULL
+;
+
+ALTER TABLE produk
+    MODIFY id_produk INT NOT NULL,
+    MODIFY nama_produk VARCHAR(100) NOT NULL,
+    MODIFY sku VARCHAR(50) NOT NULL,
+    MODIFY harga_beli DECIMAL(12,2) NOT NULL,
+    MODIFY harga_jual DECIMAL(12,2) NOT NULL,
+    MODIFY stok_minimum INT NOT NULL,
+    MODIFY stok_aktual INT NOT NULL,
+    MODIFY id_kategori INT NOT NULL,
+    DROP FOREIGN KEY produk_ibfk_1,
+    ADD CONSTRAINT fk_produk_kategori
+        FOREIGN KEY (id_kategori) REFERENCES kategori(id_kategori)
+        ON DELETE CASCADE
+;
+
+ALTER TABLE supplier
+    MODIFY id_supplier INT NOT NULL,
+    MODIFY nama_supplier VARCHAR(100) NOT NULL,
+    MODIFY kontak VARCHAR(50) NOT NULL,
+    MODIFY telepon VARCHAR(20) NOT NULL
+;
+
+ALTER TABLE transaksi_stok
+    MODIFY id_transaksi INT NOT NULL,
+    MODIFY id_supplier INT NOT NULL,
+    MODIFY id_produk INT NOT NULL,
+    MODIFY tipe_transaksi ENUM('masuk', 'keluar') NOT NULL,
+    MODIFY jumlah INT NOT NULL,
+    MODIFY waktu_transaksi DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    DROP FOREIGN KEY transaksi_stok_ibfk_1,
+    DROP FOREIGN KEY transaksi_stok_ibfk_2,
+    ADD CONSTRAINT fk_transaksi_produk
+        FOREIGN KEY (id_produk) REFERENCES produk(id_produk)
+        ON DELETE CASCADE,
+    ADD CONSTRAINT fk_transaksi_supplier
+        FOREIGN KEY (id_supplier) REFERENCES supplier(id_supplier)
+        ON DELETE CASCADE
+;
