@@ -152,9 +152,10 @@ ALTER TABLE produk
     MODIFY sku VARCHAR(50) NOT NULL,
     MODIFY harga_beli DECIMAL(12,2) NOT NULL,
     MODIFY harga_jual DECIMAL(12,2) NOT NULL,
-    MODIFY stok_minimum INT NOT NULL,
+    CHANGE stok_minimum stok_minimal INT NOT NULL,
     MODIFY stok_aktual INT NOT NULL,
     MODIFY id_kategori INT NOT NULL,
+    ADD CONSTRAINT uq_produk_sku UNIQUE (sku),
     DROP FOREIGN KEY produk_ibfk_1,
     ADD CONSTRAINT fk_produk_kategori
         FOREIGN KEY (id_kategori) REFERENCES kategori(id_kategori)
@@ -172,7 +173,7 @@ ALTER TABLE transaksi_stok
     MODIFY id_transaksi INT NOT NULL,
     MODIFY id_supplier INT NOT NULL,
     MODIFY id_produk INT NOT NULL,
-    MODIFY tipe_transaksi ENUM('masuk', 'keluar') NOT NULL,
+    CHANGE tipe_transaksi jenis_transaksi ENUM('masuk', 'keluar') NOT NULL,
     MODIFY jumlah INT NOT NULL,
     MODIFY waktu_transaksi DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     DROP FOREIGN KEY transaksi_stok_ibfk_1,
