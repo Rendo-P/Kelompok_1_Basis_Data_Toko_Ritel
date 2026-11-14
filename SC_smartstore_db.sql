@@ -176,18 +176,28 @@ ALTER TABLE transaksi_stok
     CHANGE tipe_transaksi jenis_transaksi ENUM('masuk', 'keluar') NOT NULL,
     MODIFY jumlah INT NOT NULL,
     MODIFY waktu_transaksi DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    DROP FOREIGN KEY transaksi_stok_ibfk_1,
-    DROP FOREIGN KEY transaksi_stok_ibfk_2,
+    DROP FOREIGN KEY fk_transaksi_produk,
+    DROP FOREIGN KEY fk_transaksi_supplier,
     ADD CONSTRAINT fk_transaksi_produk
         FOREIGN KEY (id_produk) REFERENCES produk(id_produk)
-        ON DELETE CASCADE,
+        ON DELETE RESTRICT,
     ADD CONSTRAINT fk_transaksi_supplier
         FOREIGN KEY (id_supplier) REFERENCES supplier(id_supplier)
-        ON DELETE CASCADE
+        ON DELETE RESTRICT
 ;
 
 INSERT INTO transaksi_stok (id_transaksi, id_supplier, id_produk, jenis_transaksi, jumlah, waktu_transaksi) VALUES
     (1, 2, 102, 'masuk', 40, DEFAULT),
-    (2, 1, 103, 'masuk', 30, DEFAULT),
+    (2, 1, 103, 'keluar', 30, DEFAULT),
     (3, 3, 101, 'masuk', 10, DEFAULT)
 ;
+
+-- sebelum alter table produk
+INSERT INTO produk (id_produk, nama_produk, sku, harga_beli, harga_jual, stok_minimum, stok_aktual, id_kategori) 
+VALUES (105, 'Susu Kotak', 'MNM105', 4500, NULL, 20, 50, 2);
+-- setelah alter table produk
+INSERT INTO produk (id_produk, nama_produk, sku, harga_beli, harga_jual, stok_minimal, stok_aktual, id_kategori) 
+VALUES (105, 'Susu Kotak', 'MNM105', 4500, NULL, 20, 50, 2);
+
+INSERT INTO produk (id_produk, nama_produk, sku, harga_beli, harga_jual, stok_minimal, stok_aktual, id_kategori) 
+VALUES (105, 'Susu Kotak', 'MNM105', 4500, 6000, 20, 50, 2);
