@@ -65,3 +65,19 @@ INSERT INTO detail_penjualan (id_penjualan, id_produk, kuantitas, harga_satuan) 
 
 -- Jika instruksi berhasil, terapkan ke database (Commit):
 COMMIT;
+
+-- revisi tahap 1 & 2
+-- revisi pertemuan 1 & 2
+SELECT * FROM transaksi_stok;
+
+SELECT 
+    t.id_transaksi,
+    p.nama_produk,
+    p.sku,
+    s.nama_supplier,
+    t.jenis_transaksi,
+    t.jumlah,
+    t.waktu_transaksi
+FROM transaksi_stok t
+JOIN produk p ON t.id_produk = p.id_produk
+JOIN supplier s ON t.id_supplier = s.id_supplier;
